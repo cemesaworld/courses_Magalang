@@ -25,18 +25,41 @@ app.get('/api/courses', async (req, res) =>{
     }
 });
 
+//Selecting & extracting the name and specialization of each course
+app.get('/courses/:year', (req, res) => {
+    const year = req.params.year;
+    Courses.findOne({ year: year })
+        .then(foundCourses => {
+            // Extracting name and specialization of each course
+            const courseData = [];
+            for (const level in foundCourses) {
+                foundCourses[level].forEach(course => {
+                    courseData.push({
+                        name: course.description,
+                        specialization: course.tags[2] 
+                    });
+                });
+            }
+            res.json(courseData); // Sending extracted courses as JSON response
+        })
+        .catch(err => {
+            res.status(500).json({ error: err.message }); 
+        });
+});
+
+
 
 //Retrieving all published BSIT & BSIS courses
 app.get('/api/BSITBSIS-course', async (req, res) =>{
     try {
         // Find BSIS courses
-        const bsisCourses = await Courses.find({ tags: 'BSIS' });
+        const bsisCourses = await Courses.find({ year: 'BSIS' });
 
         // Find BSIT courses
-        const bsitCourses = await Courses.find({ tags: 'BSIT' });
+        const bsitCourses = await Courses.find({ year: 'BSIT' });
 
         // Send the retrieved courses as JSON response
-        res.json({ bsisCourses, bsitCourses });
+        res.json({ courseData});
     } catch (err) {
         // Handle errors
         console.error(err);
@@ -52,6 +75,7 @@ mongoose.connect('mongodb+srv://cemesamagalang:S6oerW79KjYFZlUZ@cluster0.xis18fs
     .catch((error) => {
         console.error('Error connecting to MongoDB:', error);
     });
+
 
 // Start server
 const PORT = process.env.PORT || 4000;
