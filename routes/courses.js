@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Course = require('../model/courseModel');
+const courseModel = require('../model/courseModel');
 const courseData = require('../courseData/courses.json');
 const mongoose = require('mongoose');
 
@@ -14,31 +14,31 @@ mongoose.connect('mongodb+srv://cemesamagalang:S6oerW79KjYFZlUZ@cluster0.xis18fs
     })
     .catch((error) => {
         console.error('Error connecting to MongoDB:', error);
-    });
-//Retrieved all published backend courses and sorting alphabetically
-app.get('/api/courses', async (req, res) =>{
-    try {
-        const courses = await Course.find({ code: true}).sort({description: String});
-        res.json(courseData)
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error'});
-    }
 });
 
-//Retrieving all published BSIT & BSIS courses 
-app.get('/api/BSITBSIS-course', async (req, res) => {
+//Retrieved all published backend courses and sorting alphabetically
+app.get('/courses', async (req, res) => {
     try {
-        // Retrieve all BSIS courses
-        const BSISCourses = await Course.find({ tags: 'BSIS' });
-
-        // Retrieve all BSIT courses
-        const BSITCourses = await Course.find({ tags: 'BSIT' });
-        res.json({ courseData});
+      const Course = await Course.find({}).sort({ description: 1 });
+      res.json(courseData);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+      res.status(500).json({ message: err.message });
     }
+  });
+
+// POST a new course
+app.post('/', async (req, res) => {
+  // Implement the logic to add a new course
+});
+
+// UPDATE a course
+app.patch('/:id', async (req, res) => {
+  // Implement the logic to update a course
+});
+
+// DELETE a course
+app.delete('/:id', async (req, res) => {
+  // Implement the logic to delete a course
 });
 
 
